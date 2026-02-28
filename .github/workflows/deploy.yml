@@ -24,11 +24,10 @@ jobs:
 
       - name: Build site with script
         run: |
-          bash ./generate.sh
           mkdir -p _site
-          cp -r ./* _site/
-          # optionally exclude CI config from site
-          rm -rf _site/.git _site/.github || true
+          bash ./generate.sh
+          # Copy files, excluding destination dir and git artifacts
+          rsync -a --exclude='_site' --exclude='.git' --exclude='.github' ./ _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

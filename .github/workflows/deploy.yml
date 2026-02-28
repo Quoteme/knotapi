@@ -29,7 +29,20 @@ jobs:
           # Copy files, excluding destination dir and git artifacts
           rsync -a --exclude='_site' --exclude='.git' --exclude='.github' ./ _site/
 
-      - name: Upload artifact
+      - name: Create dataset archives
+        run: |
+          zip knot-data-json.zip *.json
+          zip knot-data-csv.zip *.csv
+
+      - name: Upload dataset archives as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dataset-archives
+          path: |
+            knot-data-json.zip
+            knot-data-csv.zip
+
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -44,3 +57,29 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download dataset archives
+        uses: actions/download-artifact@v4
+        with:
+          name: dataset-archives
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-data
+          name: Latest Dataset
+          body: |
+            Auto-generated dataset containing all knot coordinate data.
+
+            - `knot-data-json.zip`: All knot data in JSON format
+            - `knot-data-csv.zip`: All knot data in CSV format
+          make_latest: true
+          files: |
+            knot-data-json.zip
+            knot-data-csv.zip

@@ -13,12 +13,12 @@ while IFS=',' read -r col1 col2 col3 col4; do
 	# skip empty lines
 	[ -z "$col1" ] && continue
 
-	html="$html<li><a href='$col1.json'>$col1.json</a> <a href='$col1.csv'>$col1.csv</a><</li>"
+	html="$html<li><a href='$col1.json'>$col1.json</a> <a href='$col1.csv'>$col1.csv</a></li>"
 
 	# create file named after first column
 	# and write the third column as content
 	printf '%s\n' "${col4//;/,}" >"$col1.json"
-	printf '%s\n' "${col4//;/,}" | tr -d '[]' >"$col1.csv"
+	printf '%s\n' "${col4//;/,}" | tr -d '[]' | awk -F',' '{for(i=1;i<=NF;i+=3) print $i","$(i+1)","$(i+2)}' >"$col1.csv"
 done <"$infile"
 
 html="$html</ul></body></html>"

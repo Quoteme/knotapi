@@ -18,7 +18,7 @@ while IFS=',' read -r col1 col2 col3 col4; do
 	# create file named after first column
 	# and write the third column as content
 	printf '%s\n' "${col4//;/,}" >"$col1.json"
-	printf '%s\n' "${col4//;/,}" | tr -d '[]' | awk -F',' '{for(i=1;i<=NF;i+=3) print $i","$(i+1)","$(i+2)}' >"$col1.csv"
+	printf '%s\n' "${col4//;/,}" | tr -d '[]' | awk -F',' 'BEGIN{print "x,y,z"} {for(i=1;i<=NF;i+=3) print $i","$(i+1)","$(i+2)}' >"$col1.csv"
 done <"$infile"
 
 html="$html</ul></body></html>"
